@@ -29,5 +29,5 @@ def download_ticker_data(ticker="SPY", period=5):
     print(f"\n------First 5 Rows of {ticker} Data------")
     print(historical_data.head())
 
-    if __name__ == "__main__":
-        download_ticker_data("SPY")
+if __name__ == "__main__":
+    download_ticker_data("SPY")
