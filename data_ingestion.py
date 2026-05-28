@@ -2,17 +2,17 @@ import yfinance as yf
 import pandas as pd
 import os
 
-def download_ticker_data(ticker="SPY"):
+def download_ticker_data(ticker="SPY", period=5):
     """
-    Downloads 5 years of historical daily data for ANY given ticker 
+    Downloads X years of historical daily data for ANY given ticker 
     and saves it to a dynamically named CSV file.
     """
     
     print(f"Connecting to Yahoo Finance API for {ticker}...")
 
     asset = yf.Ticker(ticker)
-    print(f"Downloading 5 years of daily data for {ticker}...")
-    historical_data = asset.history(period="5y")
+    print(f"Downloading {period} years of daily data for {ticker}...")
+    historical_data = asset.history(period=f"{period}y")
 
 
     if historical_data.empty:
@@ -22,7 +22,7 @@ def download_ticker_data(ticker="SPY"):
     if not os.path.exists("data"):
         os.makedirs("data")
 
-    file_path = f"data/{ticker.lower()}_5yr_data.csv"
+    file_path = f"data/{ticker.lower()}_{period}yr_data.csv"
     historical_data.to_csv(file_path)
 
     print(f"Success! Data saved to {file_path}")
