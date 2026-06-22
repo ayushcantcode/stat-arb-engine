@@ -1,0 +1,31 @@
+# API Credentials
+api:
+  provider: "yfinance"
+
+# Universe Selection
+universe:
+  primary_ticker: "SPY"
+  benchmark: "^GSPC"
+  assets:
+    - "SPY"
+    - "QQQ
+    - "IWM"
+    - "DIA"
+    - "TLT"
+
+# Time Series Parameters
+data:
+  start_date: "2015-01-01"
+  end_date: "2023-12-31"
+  interval: "1d"
+  adjusted_close: true
+
+# Statistical Thresholds
+statistics:
+  adf_significance_level: 0.05
+  cointegration_method: "johansen"
+
+# Infrastructure
+database: 
+  engine: "duckdb"
+  path: "db/market_data.duckdb"

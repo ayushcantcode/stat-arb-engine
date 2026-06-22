@@ -1,1 +1,21 @@
+# Virtual Environments 
 venv/
+.venv/
+env/
+
+# Python Caches (Useless Compiled Files)
+__pycache__/
+*.pyc
+
+# Environment Variables (Your API keys - Maximum Security)
+.env
+
+# Logs (COnstantly changing clutters Github history)
+logs/
+*.log
+
+# Data and databases
+data/raw/
+data/database/
+*.csv
+*.duckdb
