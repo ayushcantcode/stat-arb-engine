@@ -1,0 +1,26 @@
+{
+    "workbench.editorAssociations": {
+        "*.parquet": "duckdb.dataFileViewer",
+        "*.csv": "duckdb.dataFileViewer",
+        "*.tsv": "duckdb.dataFileViewer",
+        "*.xlsx": "duckdb.dataFileViewer"
+    },
+    "duckdb.defaultDatabase": "market_data",
+    "duckdb.databases": [
+        {
+            "alias": "market_data",
+            "type": "file",
+            "path": "e:\\Workspace\\stat-arb-engine\\db\\market_data.duckdb",
+            "readOnly": true,
+            "attached": true
+        }
+    ],
+    "sqltools.connections": [
+        {
+            "name": "StatArb Engine DB",
+            "accessMode": "Read Only",
+            "driver": "DuckDB"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
