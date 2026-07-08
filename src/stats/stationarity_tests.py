@@ -30,3 +30,17 @@ class StationarityAnalyzer:
             logger.error(f"ADF test failed: {e}")
             return {'p_value': np.nan, 'is_stationary': False}
         
+    def phillips_perron(self, series: pd.series) -> dict:
+        """
+        Phillips-Perron Test.
+        Null Hypothesis (H0): The series has a unit root (Non-Stationary).
+        Robust to heteroskedasticity and serial correlation.
+        """
+        try:
+            pp = PhillipsPerron(series.dropna())
+            p_value = pp.pvalue
+            is_stationary = p_value < self.alpha
+            return {'p_value': p_value, 'is_stationary': is_stationary} 
+        except Exception as e:
+            logger.error(f"Phillips-Perron test failed: {e}")
+            return {'p_value': np.nan, 'is_stationary': False}
