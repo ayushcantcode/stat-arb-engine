@@ -44,3 +44,24 @@ class StationarityAnalyzer:
         except Exception as e:
             logger.error(f"Phillips-Perron test failed: {e}")
             return {'p_value': np.nan, 'is_stationary': False}
+        
+    def kpss(self, series: pd.series) -> dict:
+        """
+        KPSS Test.
+        Null Hypothesis (H0): The series is trend-stationary.
+        **Notice the flipped logic compared to ADF**
+        """
+        try:
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore") # Surpress Interpolation warnings
+                result = kpss(series.dropna(), regression='ct', nlags='auto')
+            
+            p_value = result[1]
+            is_stationary = p_value >= self.alpha
+            return {'p_value': p_value, 'is_stationary': is_stationary}
+        except Exception as e:
+            logger.error(f"KPSS test failed {e}")
+            return {'p_value': np.nan, 'is_stationary': False}
+        
+
