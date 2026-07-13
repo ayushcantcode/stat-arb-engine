@@ -16,7 +16,7 @@ class StationarityAnalyzer:
     def __init__(self, significance_level: float = 0.05):
         self.alpha = significance_level
     
-    def adf(self, series: pd.series) -> dict:
+    def adf(self, series: pd.Series) -> dict:
         """
         Augmented Dickey-Fuller Test.
         Null Hypothesis (H0): The series has a unit root (Non-Stationary).
@@ -30,7 +30,7 @@ class StationarityAnalyzer:
             logger.error(f"ADF test failed: {e}")
             return {'p_value': np.nan, 'is_stationary': False}
         
-    def phillips_perron(self, series: pd.series) -> dict:
+    def phillips_perron(self, series: pd.Series) -> dict:
         """
         Phillips-Perron Test.
         Null Hypothesis (H0): The series has a unit root (Non-Stationary).
@@ -45,7 +45,7 @@ class StationarityAnalyzer:
             logger.error(f"Phillips-Perron test failed: {e}")
             return {'p_value': np.nan, 'is_stationary': False}
         
-    def kpss(self, series: pd.series) -> dict:
+    def kpss(self, series: pd.Series) -> dict:
         """
         KPSS Test.
         Null Hypothesis (H0): The series is trend-stationary.
@@ -65,3 +65,29 @@ class StationarityAnalyzer:
             return {'p_value': np.nan, 'is_stationary': False}
         
 
+    def get_joint_conclusion(self, series: pd.Series) -> dict:
+        """
+        Runs all three tests and returns a consensus dictionary.
+        This is what your pipeline will actually call.
+        """
+        if series.empty() or (len(series.dropna()) < 30):
+            logger.warning("Series is too short or empty for reliable testing.")
+            return {"consensus_stationary": False, "confidence": "low", "details": {}}
+        
+        adf_res = self.adf(series)
+        kpss_res = self.kpss(series)
+        pp_res = self.phillips_perron(series)
+
+        tests_passed = sum([adf_res['is_stationary'], kpss_res['is_stationary'], pp_res['is_stationary']])
+        # strict consensus: majority rules. 
+        # In a highly conservative engine, you might require 3/3.
+        is_consensus_stationary = tests_passed >= 2
+        return {
+            "consensus_stationary" : is_consensus_stationary,
+            "score": f"{tests_passed}/3",
+            "details": {
+                "ADF": adf_res,
+                "KPSS": kpss_res,
+                "Phillips-Perron": pp_res
+            }
+        }
