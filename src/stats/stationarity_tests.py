@@ -70,7 +70,7 @@ class StationarityAnalyzer:
         Runs all three tests and returns a consensus dictionary.
         This is what your pipeline will actually call.
         """
-        if series.empty() or (len(series.dropna()) < 30):
+        if (series.empty or (len(series.dropna()) < 30)):
             logger.warning("Series is too short or empty for reliable testing.")
             return {"consensus_stationary": False, "confidence": "low", "details": {}}
         
@@ -91,3 +91,23 @@ class StationarityAnalyzer:
                 "Phillips-Perron": pp_res
             }
         }
+    
+# --- Quick Test ----
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+
+    # Generating a random walk (non-stationary) for the tests
+    np.random.seed(42)
+    random_walk = pd.Series(np.random.normal(0, 1, 1000).cumsum())
+    
+    # Generating white noise (Stationary)
+    white_noise = pd.Series(np.random.normal(0, 1, 1000))
+    
+    analyzer = StationarityAnalyzer()
+
+    print("Testing Random Walk (Should be Non-Stationary):")
+    print(analyzer.get_joint_conclusion(random_walk))
+
+    print("\nTesting White Noise (Should be Stationary):")
+    print(analyzer.get_joint_conclusion(white_noise))
+
