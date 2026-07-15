@@ -45,9 +45,40 @@ class PairSelector:
             for r, c in zip(rows, cols)
         ]
 
-        final_pairs.sort(key= lambda x: abs[x[2]], reverse=True)
-        logger.info(f"Found {len(final_pairs)} candidate pairs passing the >= {self.corr_threshold} threshold.")
+        final_pairs.sort(key= lambda x: abs(x[2]), reverse=True)
+        logger.info(f"Found {len(final_pairs)} candidate pairs passing the >= {self.corr_thresh} threshold.")
         return final_pairs
     
+
+# Testing
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    np.random.seed(42)
+    dates = pd.date_range('2023-01-01', periods=100)
+    asset_a = np.cumsum(np.random.normal(0, 1, 100))
+    asset_b = asset_a + np.random.normal(0, 0.5, 100)
+    asset_c = -asset_a + np.random.normal(0, 0.5, 100)
+    asset_d = np.cumsum(np.random.normal(0, 2, 100))
+
+    df = pd.DataFrame({
+        'TICKER_A': asset_a,
+        'TICKER_B': asset_b,
+        'TICKER_C': asset_c,
+        'TICKER_D': asset_d
+    }, index=dates)
+    
+    selector = PairSelector(correlation_threshold=0.8)
+    valid_pairs = selector.get_correlated_pairs(df)
+    print("\n Candidate Pairs for Correlation Testing:")
+    for p in valid_pairs:
+        print(f"{p[0]} and {p[1]} -> Corr: {p[2]:.4f}")
+
+    # Testing Error Handling
+    print("\nTesting Error Handling (Should raise ValueError):")
+    try:
+        selector.get_correlated_pairs(pd.DataFrame())
+    except Exception as e:
+        print(f"Caught expected error: {type(e).__name__} - {e}")
 
 
