@@ -20,7 +20,7 @@ class CointegrationResult:
     critical_values: Dict[str, float] = field(default_factory=dict)
     hedge_ratio: float = np.nan
     intercept: float = np.nan
-    spread_series: Optional[pd.series] = None
+    spread_series: Optional[pd.Series] = None
     half_life: float = np.nan
     r_squared: float = np.nan
     dependent_var: str = ""
@@ -35,6 +35,27 @@ class CointegrationAnalyzer:
     def __init__(self, significance_level: float = 0.05, min_obs: int = 60):
         self.alpha = significance_level
         self.min_obs = min_obs
+
+    @classmethod
+    def from_config(cls, config: dict) -> "CointegrationAnalyzer":
+        """
+        Builds a CointegrationAnalyzer from the 'cointegration' block of
+        config.yaml. Default construction path for pipeline code -- use
+        the plain constructor directly for one-off experiments.
+ 
+        Note: this only reads significance_level and min_observations.
+        The johansen.enabled/det_order/k_ar_diff keys aren't consumed here
+        since run_johansen() takes those as call-time arguments, not
+        constructor state -- and johansen.enabled is currently just a
+        documentation flag (no caller checks it yet, since PairSelector
+        only calls run_engle_granger). Wire that check in once/if you
+        build a basket-selection stage that actually calls run_johansen.
+        """
+        coint_cfg = config.get('cointegration', {})
+        return cls(
+            significance_level=coint_cfg.get('significance_level', 0.05),
+            min_observations=coint_cfg.get('min_observations', 60),
+        )
 
     def _calculate_half_life(self, spread: pd.Series) -> float:
         """
