@@ -59,6 +59,23 @@ class StationarityAnalyzer:
         # tie-breaker rather than an equal third vote. strict=True forces
         # KPSS's disagreeing null hypothesis to actually carry weight.
         self.strict = strict
+
+    @classmethod
+    def from_config(cls, config: dict) -> "StationarityAnalyzer":
+        """
+        Builds a StationarityAnalyzer from the 'statistics' block of
+        config.yaml. This is the default construction path for pipeline
+        code -- use the plain constructor directly when you want to
+        override a parameter for a one-off experiment or a test script.
+        """
+        stats_config = config.get("statistics", {})
+        return cls(
+            significance_level=stats_config.get('significance_level', 0.05),
+            regression=stats_config.get('regression', 'c'),
+            min_observations=stats_config.get('min_observations', 60),
+            strict=stats_config.get('strict_consensus', False)
+        )
+
     
     def adf(self, series: pd.Series, regression: Optional[str] = None) -> TestResult:
         """
