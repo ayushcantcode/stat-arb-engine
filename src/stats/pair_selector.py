@@ -48,6 +48,23 @@ class PairSelector:
         self.corr_thresh = correlation_threshold
         self.coint_analyzer = cointegration_analyzer or CointegrationAnalyzer()
 
+    @classmethod
+    def from_config(cls, config: dict) -> "PairSelector":
+        """
+        Builds a PairSelector from the 'pair_selection' block of
+        config.yaml, and builds its CointegrationAnalyzer from the
+        'cointegration' block via CointegrationAnalyzer.from_config --
+        so both modules stay in sync from one config file. Default
+        construction path for pipeline code; use the plain constructor
+        directly for one-off experiments.
+        """
+        ps_cfg = config.get('pair_selection', {})
+        return cls(
+            correlation_threshold=ps_cfg.get('correlation_threshold', 0.6),
+            max_half_life=ps_cfg.get('max_half_life_days', 30.0),
+            cointegration_analyzer=CointegrationAnalyzer.from_config(config),
+        )
+
     def get_correlated_pairs(self, price_df: pd.DataFrame) -> List[Tuple[str, str, float]]:
         """
         Vectorized correlation pre-filter computed on log returns.
