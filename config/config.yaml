@@ -22,8 +22,30 @@ data:
 
 # Statistical Thresholds
 statistics:
-  adf_significance_level: 0.05
-  cointegration_method: "johansen"
+  significance_level: 0.05
+  min_observations: 60
+  regression : "c" 
+  # 'c' | 'ct' | 'n' -- MUST match what's being tested.
+  # 'c'  : cointegration spread residuals (default, safest)
+  # 'ct' : raw asset prices with plausible real drift
+  # 'n'  : zero-mean residuals only -- auto-skips KPSS
+  strict_consensus: false    # true = require unanimous 3/3 instead of majority 2/3
+
+# Pair Selection (PairSelector: two-stage correlation pre-filter -> cointegration gate)
+pair_selection:
+  correlation_threshold: 0.6   # Stage 1 pre-filter on RETURNS -- candidates only, not a verdict
+  max_half_life_days: 30       # Stage 2: reject pairs that revert too slowly to trade profitably
+
+# Cointegration Engine (CointegrationAnalyzer)
+cointegration:
+  significance_level: 0.05
+  min_observations: 60
+  primary_method: "engle_granger"   # what pair_selection actually uses today
+  johansen:
+    enabled: false                  # built, but not yet called by any pipeline stage --
+     # reserved for future 3+ asset basket cointegration
+    det_order: 0
+    k_ar_diff: null                 # null = auto-select via AIC
 
 # Infrastructure
 database: 
