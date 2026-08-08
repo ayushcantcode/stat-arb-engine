@@ -72,7 +72,7 @@ class StationarityAnalyzer:
         return cls(
             significance_level=stats_config.get('significance_level', 0.05),
             regression=stats_config.get('regression', 'c'),
-            min_observations=stats_config.get('min_observations', 60),
+            min_obs=stats_config.get('min_observations', 60),
             strict=stats_config.get('strict_consensus', False)
         )
 
