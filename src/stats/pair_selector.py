@@ -44,9 +44,10 @@ class PairSelector:
     always run it through Stage 2.
     """
 
-    def __init__(self, correlation_threshold: float = 0.6, cointegration_analyzer: Optional[CointegrationAnalyzer] = None):
+    def __init__(self, correlation_threshold: float = 0.6, max_half_life: float = 30.0, cointegration_analyzer: Optional[CointegrationAnalyzer] = None):
         self.corr_thresh = correlation_threshold
         self.coint_analyzer = cointegration_analyzer or CointegrationAnalyzer()
+        self.max_half_life = max_half_life
 
     @classmethod
     def from_config(cls, config: dict) -> "PairSelector":
@@ -104,7 +105,7 @@ class PairSelector:
         # Extracting the row and column indices where the mask is True
         rows, cols = np.where(valid_pairs_mask)
         # Mapping the indices back to ticker symbols directly into our final list
-        tickers = price_df.columns
+        tickers = returns_df.columns
         final_pairs = [
             (tickers[r], tickers[c], corr_matrix[r, c])
             for r, c in zip(rows, cols)
@@ -128,6 +129,7 @@ class PairSelector:
         move on to signal generation / backtesting.
         """
 
+        mhl = max_half_life if max_half_life is not None else self.max_half_life
         results: List[CointegratedPair] = []
 
         for ticker_a, ticker_b, corr in candidate_pairs:
@@ -136,10 +138,10 @@ class PairSelector:
             if not eg_result.is_cointegrated:
                 continue
 
-            if np.isnan(eg_result.half_life) or eg_result.half_life > max_half_life:
+            if np.isnan(eg_result.half_life) or eg_result.half_life > mhl:
                 logger.info(
                     f"{ticker_a}-{ticker_b}: cointegrated (p={eg_result.p_value:.4f}) "
-                    f"but half-life {eg_result.half_life:.1f}d exceeds the {max_half_life}d cap. Therefore, skipping."
+                    f"but half-life {eg_result.half_life:.1f}d exceeds the {mhl}d cap. Therefore, skipping."
                 )
                 continue
 
