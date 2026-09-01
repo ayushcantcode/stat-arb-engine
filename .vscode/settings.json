@@ -12,7 +12,7 @@
             "type": "file",
             "path": "e:\\Workspace\\stat-arb-engine\\db\\market_data.duckdb",
             "readOnly": true,
-            "attached": true
+            "attached": false
         }
     ],
     "sqltools.connections": [
